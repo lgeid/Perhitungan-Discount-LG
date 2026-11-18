@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Biaya Servis & Spare Part</title>
+    <style>
+        :root {
+            --primary: #990000;
+            --accent: #ff6600;
+            --bg-light: #f4f5f7;
+            --text-dark: #222222;
+            --text-muted: #666666;
+            --border-color: #dddddd;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+
+        .container {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), #cc0000);
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .form-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--text-dark);
+        }
+
+        .toggle-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: #ffffff;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.2s;
+        }
+
+        .toggle-btn.active-non {
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
+        }
+
+        .toggle-btn.active-garansi {
+            background: #198754;
+            color: #ffffff;
+            border-color: #198754;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix, .input-suffix {
+            position: absolute;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .input-prefix { left: 12px; }
+        .input-suffix { right: 12px; }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        input.has-prefix { padding-left: 42px; }
+        input.has-suffix { padding-right: 36px; }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .summary-card {
+            background: #fafafa;
+            border: 1px solid #eeeeee;
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 20px;
+        }
+
+        .part-info-box {
+            display: none;
+            background: #fff3cd;
+            border-left: 3px solid var(--accent);
+            padding: 8px 10px;
+            margin-bottom: 12px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: #333333;
+        }
+
+        .part-info-box strong {
+            color: var(--primary);
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .summary-row.divider {
+            border-top: 1px solid #e5e5e5;
+            padding-top: 10px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .summary-row.discount {
+            color: #198754;
+        }
+
+        .summary-row.total {
+            border-top: 2px dashed var(--border-color);
+            padding-top: 12px;
+            margin-top: 12px;
+            margin-bottom: 0;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .badge-garansi {
+            display: none;
+            background: #d1e7dd;
+            color: #0f5132;
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            margin-top: 6px;
+        }
+
+        .btn-reset {
+            width: 100%;
+            margin-top: 16px;
+            padding: 12px;
+            background: var(--accent);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reset:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>Kalkulator Biaya Servis</h1>
+        <p>Hitung Ongkos Kerja, Spare Part, Diskon & PPN 11%</p>
+    </div>
+
+    <div class="form-body">
+        <!-- Status Garansi -->
+        <div class="form-group">
+            <label>Status Pembelian / Garansi</label>
+            <div class="toggle-group">
+                <button type="button" id="btnNonGaransi" class="toggle-btn active-non" onclick="setWarranty(false)">Non-Garansi</button>
+                <button type="button" id="btnGaransi" class="toggle-btn" onclick="setWarranty(true)">Garansi (Free)</button>
+            </div>
+            <div id="warrantyNote" class="badge-garansi">
+                ✓ Status Garansi Aktif: Total tagihan otomatis Rp 0
+            </div>
+        </div>
+
+        <!-- Ongkos Kerja -->
+        <div class="form-group">
+            <label for="laborCost">Ongkos Kerja (Labor Cost)</label>
+            <div class="input-wrapper">
+                <span class="input-prefix">Rp</span>
+                <input type="number" id="laborCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- Kode Part & Nama Part -->
+        <div class="form-row">
+            <div class="form-group">
+                <label for="partCode">Kode Part</label>
+                <input type="text" id="partCode" placeholder="Contoh: EAU631032" oninput="calculate()">
+            </div>
+            <div class="form-group">
+                <label for="partName">Nama Part</label>
+                <input type="text" id="partName" placeholder="Contoh: Motor Drain" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- Harga Spare Part -->
+        <div class="form-group">
+            <label for="partCost">Harga Spare Part</label>
+            <div class="input-wrapper">
+                <span class="input-prefix">Rp</span>
+                <input type="number" id="partCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
+            </div>
+        </div>
+
+        <!-- Diskon -->
+        <div class="form-group">
+            <label for="discountPercent">Diskon (%)</label>
+            <div class="input-wrapper">
+                <input type="number" id="discountPercent" class="has-suffix" value="20" min="0" max="100" oninput="calculate()">
+                <span class="input-suffix">%</span>
+            </div>
+            <label class="checkbox-group">
+                <input type="checkbox" id="discountOnlyPart" onchange="calculate()">
+                <span>Terapkan diskon hanya pada Spare Part (Ongkos kerja tidak didiskon)</span>
+            </label>
+        </div>
+
+        <!-- Rincian Perhitungan -->
+        <div class="summary-card">
+            <!-- Info Part yang diinput -->
+            <div id="partInfoDisplay" class="part-info-box"></div>
+
+            <!-- Subtotal Terpisah -->
+            <div class="summary-row">
+                <span>Ongkos Kerja</span>
+                <span id="dispLabor">Rp 0</span>
+            </div>
+            <div class="summary-row">
+                <span id="dispPartLabel">Harga Spare Part</span>
+                <span id="dispPart">Rp 0</span>
+            </div>
+            <div class="summary-row divider">
+                <span>Total Sebelum Diskon</span>
+                <span id="dispSubtotal">Rp 0</span>
+            </div>
+
+            <!-- Diskon & Pajak -->
+            <div class="summary-row discount">
+                <span id="dispDiscountLabel">Diskon (20%)</span>
+                <span id="dispDiscount">- Rp 0</span>
+            </div>
+            <div class="summary-row">
+                <span>Dasar Pengenaan Pajak (DPP)</span>
+                <span id="dispDpp">Rp 0</span>
+            </div>
+            <div class="summary-row">
+                <span>PPN (11%)</span>
+                <span id="dispPpn">Rp 0</span>
+            </div>
+            <div class="summary-row total">
+                <span>Total Bayar</span>
+                <span id="dispTotal">Rp 0</span>
+            </div>
+        </div>
+
+        <button type="button" class="btn-reset" onclick="resetForm()">Reset Perhitungan</button>
+    </div>
+</div>
+
+<script>
+    let isWarranty = false;
+
+    function formatRupiah(angka) {
+        return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+    }
+
+    function setWarranty(status) {
+        isWarranty = status;
+        const btnNon = document.getElementById('btnNonGaransi');
+        const btnGaransi = document.getElementById('btnGaransi');
+        const note = document.getElementById('warrantyNote');
+
+        if (isWarranty) {
+            btnGaransi.classList.add('active-garansi');
+            btnNon.classList.remove('active-non');
+            note.style.display = 'block';
+        } else {
+            btnNon.classList.add('active-non');
+            btnGaransi.classList.remove('active-garansi');
+            note.style.display = 'none';
+        }
+        calculate();
+    }
+
+    function calculate() {
+        const labor = parseFloat(document.getElementById('laborCost').value) || 0;
+        const part = parseFloat(document.getElementById('partCost').value) || 0;
+        const partCode = document.getElementById('partCode').value.trim();
+        const partName = document.getElementById('partName').value.trim();
+        const discPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+        const discountOnlyPart = document.getElementById('discountOnlyPart').checked;
+
+        const subtotal = labor + part;
+
+        // Tampilkan detail Kode & Nama Part di rincian jika diisi
+        const partInfoBox = document.getElementById('partInfoDisplay');
+        if (partCode || partName) {
+            partInfoBox.style.display = 'block';
+            const kodeText = partCode ? `<strong>[${partCode}]</strong> ` : '';
+            const namaText = partName ? partName : 'Spare Part';
+            partInfoBox.innerHTML = `Part: ${kodeText}${namaText}`;
+        } else {
+            partInfoBox.style.display = 'none';
+        }
+
+        // Tampilkan rincian Ongkos & Part secara terpisah
+        document.getElementById('dispLabor').innerText = formatRupiah(labor);
+        document.getElementById('dispPart').innerText = formatRupiah(part);
+        document.getElementById('dispSubtotal').innerText = formatRupiah(subtotal);
+
+        // Jika status garansi dipilih, semua biaya menjadi 0
+        if (isWarranty) {
+            document.getElementById('dispDiscountLabel').innerText = `Potongan Garansi (100%)`;
+            document.getElementById('dispDiscount').innerText = `- ${formatRupiah(subtotal)}`;
+            document.getElementById('dispDpp').innerText = 'Rp 0';
+            document.getElementById('dispPpn').innerText = 'Rp 0';
+            document.getElementById('dispTotal').innerText = 'Rp 0';
+            return;
+        }
+
+        // Hitung diskon
+        const discountBase = discountOnlyPart ? part : subtotal;
+        const discountAmount = discountBase * (discPercent / 100);
+
+        // Hitung DPP & PPN 11%
+        const dpp = Math.max(0, subtotal - discountAmount);
+        const ppn = dpp * 0.11;
+        const grandTotal = dpp + ppn;
+
+        // Tampilkan hasil ke layar
+        document.getElementById('dispDiscountLabel').innerText = `Diskon (${discPercent}%)`;
+        document.getElementById('dispDiscount').innerText = `- ${formatRupiah(discountAmount)}`;
+        document.getElementById('dispDpp').innerText = formatRupiah(dpp);
+        document.getElementById('dispPpn').innerText = formatRupiah(ppn);
+        document.getElementById('dispTotal').innerText = formatRupiah(grandTotal);
+    }
+
+    function resetForm() {
+        document.getElementById('laborCost').value = '';
+        document.getElementById('partCode').value = '';
+        document.getElementById('partName').value = '';
+        document.getElementById('partCost').value = '';
+        document.getElementById('discountPercent').value = 20;
+        document.getElementById('discountOnlyPart').checked = false;
+        setWarranty(false);
+    }
+</script>
+
+</body>
+</html>
