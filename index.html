@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalkulator Biaya Servis & Spare Part</title>
+    <title>Kalkulator & Penawaran Biaya Servis</title>
     <style>
         :root {
             --primary: #990000;
@@ -12,6 +12,8 @@
             --text-dark: #222222;
             --text-muted: #666666;
             --border-color: #dddddd;
+            --whatsapp: #25D366;
+            --email: #0d6efd;
         }
 
         * {
@@ -26,7 +28,7 @@
             color: var(--text-dark);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             padding: 16px;
         }
@@ -34,10 +36,11 @@
         .container {
             background: #ffffff;
             width: 100%;
-            max-width: 480px;
+            max-width: 540px;
             border-radius: 12px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
             overflow: hidden;
+            margin-bottom: 30px;
         }
 
         .header {
@@ -62,14 +65,30 @@
             padding: 20px;
         }
 
+        .section-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 6px;
+            margin-top: 20px;
+            margin-bottom: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .form-row {
             display: flex;
             gap: 10px;
-            margin-bottom: 16px;
+            margin-bottom: 14px;
         }
 
         .form-row .form-group {
@@ -79,9 +98,9 @@
 
         .form-group label {
             display: block;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             color: var(--text-dark);
         }
 
@@ -125,36 +144,90 @@
             position: absolute;
             color: var(--text-muted);
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         .input-prefix { left: 12px; }
         .input-suffix { right: 12px; }
 
-        input[type="number"], input[type="text"] {
+        input[type="number"], input[type="text"], input[type="tel"], textarea {
             width: 100%;
-            padding: 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 500;
             outline: none;
             transition: border-color 0.2s;
         }
 
-        input[type="number"]:focus, input[type="text"]:focus {
+        textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        input:focus, textarea:focus {
             border-color: var(--accent);
         }
 
-        input.has-prefix { padding-left: 42px; }
-        input.has-suffix { padding-right: 36px; }
+        input.has-prefix { padding-left: 38px; }
+        input.has-suffix { padding-right: 34px; }
+
+        /* Dynamic Spare Part Item Card */
+        .part-item-card {
+            background: #f9f9fb;
+            border: 1px solid #e2e5ec;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .part-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+        }
+
+        .btn-remove-part {
+            background: #fee2e2;
+            color: #dc2626;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-add-part {
+            width: 100%;
+            padding: 10px;
+            background: #fff5f5;
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+            transition: background 0.2s;
+        }
+
+        .btn-add-part:hover {
+            background: #ffe3e3;
+        }
 
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 8px;
             margin-top: 8px;
-            font-size: 0.85rem;
+            font-size: 0.83rem;
             color: var(--text-muted);
             cursor: pointer;
         }
@@ -168,38 +241,47 @@
 
         .summary-card {
             background: #fafafa;
-            border: 1px solid #eeeeee;
+            border: 1px solid #e5e5e5;
             border-radius: 8px;
             padding: 16px;
             margin-top: 20px;
         }
 
-        .part-info-box {
-            display: none;
-            background: #fff3cd;
-            border-left: 3px solid var(--accent);
-            padding: 8px 10px;
+        .part-list-summary {
+            background: #ffffff;
+            border: 1px solid #eeeeee;
+            border-radius: 6px;
+            padding: 10px;
             margin-bottom: 12px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            color: #333333;
+            font-size: 0.83rem;
         }
 
-        .part-info-box strong {
-            color: var(--primary);
+        .part-list-summary-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+        }
+
+        .part-summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 4px;
+            color: #444;
         }
 
         .summary-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-size: 0.88rem;
             color: var(--text-muted);
         }
 
         .summary-row.divider {
-            border-top: 1px solid #e5e5e5;
-            padding-top: 10px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 8px;
             font-weight: 600;
             color: var(--text-dark);
         }
@@ -211,40 +293,89 @@
         .summary-row.total {
             border-top: 2px dashed var(--border-color);
             padding-top: 12px;
-            margin-top: 12px;
+            margin-top: 10px;
             margin-bottom: 0;
             font-size: 1.15rem;
             font-weight: 700;
             color: var(--primary);
         }
 
+        .dp-alert {
+            display: none;
+            background: #fff3cd;
+            border: 1px solid #ffecb5;
+            color: #664d03;
+            padding: 10px 12px;
+            border-radius: 6px;
+            margin-top: 12px;
+            font-size: 0.85rem;
+        }
+
+        .dp-alert strong {
+            display: block;
+            font-size: 0.95rem;
+            color: #990000;
+            margin-top: 2px;
+        }
+
+        .terms-box {
+            background: #f8f9fa;
+            border-left: 3px solid var(--primary);
+            padding: 10px 12px;
+            margin-top: 14px;
+            font-size: 0.78rem;
+            color: #444444;
+            line-height: 1.45;
+        }
+
+        .terms-box ul {
+            padding-left: 16px;
+            margin-top: 4px;
+        }
+
         .badge-garansi {
             display: none;
             background: #d1e7dd;
             color: #0f5132;
-            font-size: 0.75rem;
-            padding: 4px 8px;
-            border-radius: 4px;
+            font-size: 0.78rem;
+            padding: 6px 10px;
+            border-radius: 6px;
             font-weight: 600;
-            margin-top: 6px;
+            margin-top: 8px;
         }
 
-        .btn-reset {
-            width: 100%;
+        .action-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
             margin-top: 16px;
-            padding: 12px;
-            background: var(--accent);
-            color: #ffffff;
+        }
+
+        .btn-action {
+            padding: 11px;
             border: none;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
             transition: opacity 0.2s;
         }
 
-        .btn-reset:hover {
-            opacity: 0.9;
+        .btn-action:hover { opacity: 0.9; }
+        .btn-wa { background: var(--whatsapp); }
+        .btn-email { background: var(--email); }
+        .btn-save { background: #333333; }
+        .btn-reset { background: var(--accent); }
+
+        @media print {
+            body { background: #fff; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; }
+            .btn-add-part, .btn-remove-part, .action-grid, .checkbox-group { display: none !important; }
         }
     </style>
 </head>
@@ -252,12 +383,40 @@
 
 <div class="container">
     <div class="header">
-        <h1>Kalkulator Biaya Servis</h1>
-        <p>Hitung Ongkos Kerja, Spare Part, Diskon & PPN 11%</p>
+        <h1>Estimasi & Penawaran Biaya Servis</h1>
+        <p>Rincian Jasa, Spare Part, Diskon & PPN 11%</p>
     </div>
 
     <div class="form-body">
-        <!-- Status Garansi -->
+        <!-- DATA CUSTOMER -->
+        <div class="section-title">1. Data Customer & Unit</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="custName">Nama Customer</label>
+                <input type="text" id="custName" placeholder="Nama lengkap">
+            </div>
+            <div class="form-group">
+                <label for="custPhone">No. HP / WhatsApp</label>
+                <input type="tel" id="custPhone" placeholder="0812xxxxxxxx">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="custAddress">Alamat Lengkap</label>
+            <textarea id="custAddress" placeholder="Masukkan alamat lengkap customer"></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="unitModel">Model Unit</label>
+                <input type="text" id="unitModel" placeholder="Contoh: T2108VSPM">
+            </div>
+            <div class="form-group">
+                <label for="unitSerial">No. Seri (Serial Number)</label>
+                <input type="text" id="unitSerial" placeholder="Contoh: 204KWxxxxx">
+            </div>
+        </div>
+
+        <!-- STATUS GARANSI -->
+        <div class="section-title">2. Status Garansi & Jasa</div>
         <div class="form-group">
             <label>Status Pembelian / Garansi</label>
             <div class="toggle-group">
@@ -265,41 +424,49 @@
                 <button type="button" id="btnGaransi" class="toggle-btn" onclick="setWarranty(true)">Garansi (Free)</button>
             </div>
             <div id="warrantyNote" class="badge-garansi">
-                ✓ Status Garansi Aktif: Total tagihan otomatis Rp 0
+                ✓ Status Garansi Aktif: Total tagihan customer otomatis Rp 0
             </div>
         </div>
 
-        <!-- Ongkos Kerja -->
-        <div class="form-group">
-            <label for="laborCost">Ongkos Kerja (Labor Cost)</label>
-            <div class="input-wrapper">
-                <span class="input-prefix">Rp</span>
-                <input type="number" id="laborCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
-            </div>
-        </div>
-
-        <!-- Kode Part & Nama Part -->
         <div class="form-row">
             <div class="form-group">
-                <label for="partCode">Kode Part</label>
-                <input type="text" id="partCode" placeholder="Contoh: EAU631032" oninput="calculate()">
+                <label for="laborCost">Ongkos Kerja (Labor)</label>
+                <div class="input-wrapper">
+                    <span class="input-prefix">Rp</span>
+                    <input type="number" id="laborCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
+                </div>
             </div>
             <div class="form-group">
-                <label for="partName">Nama Part</label>
-                <input type="text" id="partName" placeholder="Contoh: Motor Drain" oninput="calculate()">
+                <label for="visitCost">Biaya Visit / Kunjungan</label>
+                <div class="input-wrapper">
+                    <span class="input-prefix">Rp</span>
+                    <input type="number" id="visitCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
+                </div>
             </div>
         </div>
 
-        <!-- Harga Spare Part -->
-        <div class="form-group">
-            <label for="partCost">Harga Spare Part</label>
-            <div class="input-wrapper">
-                <span class="input-prefix">Rp</span>
-                <input type="number" id="partCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
+        <!-- BIAYA LAINNYA -->
+        <div class="form-row">
+            <div class="form-group" style="flex: 1.3;">
+                <label for="otherDesc">Biaya Lainnya (Sebutkan)</label>
+                <input type="text" id="otherDesc" placeholder="Contoh: Las / Freon / Ongkir" oninput="calculate()">
+            </div>
+            <div class="form-group" style="flex: 1;">
+                <label for="otherCost">Nominal Lainnya</label>
+                <div class="input-wrapper">
+                    <span class="input-prefix">Rp</span>
+                    <input type="number" id="otherCost" class="has-prefix" placeholder="0" min="0" oninput="calculate()">
+                </div>
             </div>
         </div>
 
-        <!-- Diskon -->
+        <!-- DAFTAR SPARE PART -->
+        <div class="section-title">3. Rincian Spare Part</div>
+        <div id="partsContainer"></div>
+        <button type="button" class="btn-add-part" onclick="addPartRow()">+ Tambah Item Spare Part</button>
+
+        <!-- DISKON -->
+        <div class="section-title">4. Pengaturan Diskon</div>
         <div class="form-group">
             <label for="discountPercent">Diskon (%)</label>
             <div class="input-wrapper">
@@ -308,14 +475,14 @@
             </div>
             <label class="checkbox-group">
                 <input type="checkbox" id="discountOnlyPart" onchange="calculate()">
-                <span>Terapkan diskon hanya pada Spare Part (Ongkos kerja tidak didiskon)</span>
+                <span>Terapkan diskon hanya pada total Spare Part (Jasa & lainnya tidak didiskon)</span>
             </label>
         </div>
 
-        <!-- Rincian Perhitungan -->
-        <div class="summary-card">
-            <!-- Info Part yang diinput -->
-            <div id="partInfoDisplay" class="part-info-box"></div>
+        <!-- RINGKASAN PERHITUNGAN -->
+        <div class="summary-card" id="summaryArea">
+            <!-- Rincian Item Part -->
+            <div id="partSummaryList" class="part-list-summary" style="display: none;"></div>
 
             <!-- Subtotal Terpisah -->
             <div class="summary-row">
@@ -323,11 +490,19 @@
                 <span id="dispLabor">Rp 0</span>
             </div>
             <div class="summary-row">
-                <span id="dispPartLabel">Harga Spare Part</span>
-                <span id="dispPart">Rp 0</span>
+                <span>Biaya Visit</span>
+                <span id="dispVisit">Rp 0</span>
+            </div>
+            <div class="summary-row">
+                <span id="dispOtherLabel">Biaya Lainnya</span>
+                <span id="dispOther">Rp 0</span>
+            </div>
+            <div class="summary-row">
+                <span>Total Harga Spare Part</span>
+                <span id="dispPartTotal">Rp 0</span>
             </div>
             <div class="summary-row divider">
-                <span>Total Sebelum Diskon</span>
+                <span>Subtotal Keseluruhan</span>
                 <span id="dispSubtotal">Rp 0</span>
             </div>
 
@@ -348,17 +523,78 @@
                 <span>Total Bayar</span>
                 <span id="dispTotal">Rp 0</span>
             </div>
+
+            <!-- Peringatan DP 50% jika > 1 Juta -->
+            <div id="dpAlertBox" class="dp-alert">
+                ⚠️ Total biaya di atas Rp 1.000.000. Diperlukan Uang Muka (DP 50%) sebagai bukti kepastian persetujuan:
+                <strong id="dispDpAmount">Rp 0</strong>
+            </div>
+
+            <!-- Syarat & Ketentuan Penawaran -->
+            <div class="terms-box">
+                <strong>Syarat & Ketentuan Penawaran:</strong>
+                <ul>
+                    <li>Penawaran biaya ini hanya berlaku selama <strong>1 Minggu (7 hari)</strong> untuk konfirmasi persetujuan.</li>
+                    <li>Apabila melewati batas 7 hari belum ada konfirmasi persetujuan, harga sewaktu-waktu dapat berubah dan harus dibuatkan ulang perhitungannya.</li>
+                    <li>Untuk total biaya di atas <strong>Rp 1.000.000</strong>, wajib menyertakan Uang Muka (DP) sebesar <strong>50%</strong> sebagai tanda jadi / kepastian persetujuan biaya.</li>
+                </ul>
+            </div>
         </div>
 
-        <button type="button" class="btn-reset" onclick="resetForm()">Reset Perhitungan</button>
+        <!-- TOMBOL AKSI: WA, EMAIL, SIMPAN, RESET -->
+        <div class="action-grid">
+            <button type="button" class="btn-action btn-wa" onclick="shareWhatsApp()">Kirim WhatsApp</button>
+            <button type="button" class="btn-action btn-email" onclick="shareEmail()">Kirim Email</button>
+            <button type="button" class="btn-action btn-save" onclick="saveAsTxt()">Simpan File (.txt)</button>
+            <button type="button" class="btn-action btn-reset" onclick="resetForm()">Reset Semua</button>
+        </div>
     </div>
 </div>
 
 <script>
     let isWarranty = false;
+    let partCounter = 0;
 
     function formatRupiah(angka) {
         return 'Rp ' + Math.round(angka).toLocaleString('id-ID');
+    }
+
+    // Tambah baris input spare part baru
+    function addPartRow(code = '', name = '', price = '') {
+        partCounter++;
+        const container = document.getElementById('partsContainer');
+        const rowId = `part-row-${partCounter}`;
+
+        const html = `
+            <div class="part-item-card" id="${rowId}">
+                <div class="part-item-header">
+                    <span>Spare Part #${partCounter}</span>
+                    ${partCounter > 1 ? `<button type="button" class="btn-remove-part" onclick="removePartRow('${rowId}')">Hapus</button>` : ''}
+                </div>
+                <div class="form-row" style="margin-bottom: 8px;">
+                    <div class="form-group">
+                        <input type="text" class="part-code" placeholder="Kode Part" value="${code}" oninput="calculate()">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="part-name" placeholder="Nama Part" value="${name}" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="input-wrapper">
+                    <span class="input-prefix">Rp</span>
+                    <input type="number" class="part-price has-prefix" placeholder="Harga Spare Part" min="0" value="${price}" oninput="calculate()">
+                </div>
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', html);
+        calculate();
+    }
+
+    function removePartRow(rowId) {
+        const el = document.getElementById(rowId);
+        if (el) {
+            el.remove();
+            calculate();
+        }
     }
 
     function setWarranty(status) {
@@ -379,44 +615,86 @@
         calculate();
     }
 
+    function getPartsData() {
+        const cards = document.querySelectorAll('.part-item-card');
+        const items = [];
+        let totalPartCost = 0;
+
+        cards.forEach((card, index) => {
+            const code = card.querySelector('.part-code').value.trim();
+            const name = card.querySelector('.part-name').value.trim();
+            const price = parseFloat(card.querySelector('.part-price').value) || 0;
+            totalPartCost += price;
+
+            if (code || name || price > 0) {
+                items.push({
+                    no: index + 1,
+                    code: code,
+                    name: name || 'Spare Part',
+                    price: price
+                });
+            }
+        });
+
+        return { items, totalPartCost };
+    }
+
     function calculate() {
         const labor = parseFloat(document.getElementById('laborCost').value) || 0;
-        const part = parseFloat(document.getElementById('partCost').value) || 0;
-        const partCode = document.getElementById('partCode').value.trim();
-        const partName = document.getElementById('partName').value.trim();
+        const visit = parseFloat(document.getElementById('visitCost').value) || 0;
+        const otherDesc = document.getElementById('otherDesc').value.trim();
+        const other = parseFloat(document.getElementById('otherCost').value) || 0;
+
+        const { items, totalPartCost } = getPartsData();
+
         const discPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
         const discountOnlyPart = document.getElementById('discountOnlyPart').checked;
 
-        const subtotal = labor + part;
-
-        // Tampilkan detail Kode & Nama Part di rincian jika diisi
-        const partInfoBox = document.getElementById('partInfoDisplay');
-        if (partCode || partName) {
-            partInfoBox.style.display = 'block';
-            const kodeText = partCode ? `<strong>[${partCode}]</strong> ` : '';
-            const namaText = partName ? partName : 'Spare Part';
-            partInfoBox.innerHTML = `Part: ${kodeText}${namaText}`;
+        // Tampilkan daftar rincian part di ringkasan
+        const partListBox = document.getElementById('partSummaryList');
+        if (items.length > 0) {
+            partListBox.style.display = 'block';
+            let listHtml = `<div class="part-list-summary-title">Daftar Spare Part (${items.length} Item):</div>`;
+            items.forEach(item => {
+                const kodeTag = item.code ? `[${item.code}] ` : '';
+                listHtml += `
+                    <div class="part-summary-line">
+                        <span>• ${kodeTag}${item.name}</span>
+                        <span>${formatRupiah(item.price)}</span>
+                    </div>
+                `;
+            });
+            partListBox.innerHTML = listHtml;
         } else {
-            partInfoBox.style.display = 'none';
+            partListBox.style.display = 'none';
         }
 
-        // Tampilkan rincian Ongkos & Part secara terpisah
+        // Update Label Biaya Lainnya
+        document.getElementById('dispOtherLabel').innerText = otherDesc ? `Biaya Lainnya (${otherDesc})` : 'Biaya Lainnya';
+
+        // Update nilai terpisah
         document.getElementById('dispLabor').innerText = formatRupiah(labor);
-        document.getElementById('dispPart').innerText = formatRupiah(part);
+        document.getElementById('dispVisit').innerText = formatRupiah(visit);
+        document.getElementById('dispOther').innerText = formatRupiah(other);
+        document.getElementById('dispPartTotal').innerText = formatRupiah(totalPartCost);
+
+        const subtotal = labor + visit + other + totalPartCost;
         document.getElementById('dispSubtotal').innerText = formatRupiah(subtotal);
 
-        // Jika status garansi dipilih, semua biaya menjadi 0
+        const dpAlertBox = document.getElementById('dpAlertBox');
+
         if (isWarranty) {
             document.getElementById('dispDiscountLabel').innerText = `Potongan Garansi (100%)`;
             document.getElementById('dispDiscount').innerText = `- ${formatRupiah(subtotal)}`;
             document.getElementById('dispDpp').innerText = 'Rp 0';
             document.getElementById('dispPpn').innerText = 'Rp 0';
             document.getElementById('dispTotal').innerText = 'Rp 0';
-            return;
+            dpAlertBox.style.display = 'none';
+            return { subtotal, discountAmount: subtotal, dpp: 0, ppn: 0, grandTotal: 0, dpRequired: 0, items };
         }
 
         // Hitung diskon
-        const discountBase = discountOnlyPart ? part : subtotal;
+        const discountBase = discountOnlyPart ? totalPartCost : subtotal;
         const discountAmount = discountBase * (discPercent / 100);
 
         // Hitung DPP & PPN 11%
@@ -424,23 +702,145 @@
         const ppn = dpp * 0.11;
         const grandTotal = dpp + ppn;
 
-        // Tampilkan hasil ke layar
         document.getElementById('dispDiscountLabel').innerText = `Diskon (${discPercent}%)`;
         document.getElementById('dispDiscount').innerText = `- ${formatRupiah(discountAmount)}`;
         document.getElementById('dispDpp').innerText = formatRupiah(dpp);
         document.getElementById('dispPpn').innerText = formatRupiah(ppn);
         document.getElementById('dispTotal').innerText = formatRupiah(grandTotal);
+
+        // Cek syarat DP 50% jika total > 1.000.000
+        let dpRequired = 0;
+        if (grandTotal > 1000000) {
+            dpRequired = grandTotal * 0.5;
+            dpAlertBox.style.display = 'block';
+            document.getElementById('dispDpAmount').innerText = formatRupiah(dpRequired);
+        } else {
+            dpAlertBox.style.display = 'none';
+        }
+
+        return { subtotal, discountAmount, dpp, ppn, grandTotal, dpRequired, items };
+    }
+
+    // Format teks lengkap untuk WA, Email, dan File TXT
+    function generateReportText() {
+        const calc = calculate();
+        const custName = document.getElementById('custName').value.trim() || '-';
+        const custPhone = document.getElementById('custPhone').value.trim() || '-';
+        const custAddress = document.getElementById('custAddress').value.trim() || '-';
+        const unitModel = document.getElementById('unitModel').value.trim() || '-';
+        const unitSerial = document.getElementById('unitSerial').value.trim() || '-';
+
+        const labor = parseFloat(document.getElementById('laborCost').value) || 0;
+        const visit = parseFloat(document.getElementById('visitCost').value) || 0;
+        const otherDesc = document.getElementById('otherDesc').value.trim();
+        const other = parseFloat(document.getElementById('otherCost').value) || 0;
+        const discPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+
+        const tgl = new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+        let text = `*ESTIMASI & PENAWARAN BIAYA SERVIS*\n`;
+        text += `Tanggal: ${tgl}\n`;
+        text += `Status: ${isWarranty ? 'GARANSI (FREE)' : 'NON-GARANSI'}\n`;
+        text += `----------------------------------------\n`;
+        text += `*DATA CUSTOMER & UNIT*\n`;
+        text += `Nama   : ${custName}\n`;
+        text += `No. HP : ${custPhone}\n`;
+        text += `Alamat : ${custAddress}\n`;
+        text += `Model  : ${unitModel}\n`;
+        text += `No.Seri: ${unitSerial}\n`;
+        text += `----------------------------------------\n`;
+        text += `*RINCIAN BIAYA*\n`;
+        text += `• Ongkos Kerja : ${formatRupiah(labor)}\n`;
+        text += `• Biaya Visit  : ${formatRupiah(visit)}\n`;
+        if (other > 0 || otherDesc) {
+            text += `• Lainnya (${otherDesc || '-'}): ${formatRupiah(other)}\n`;
+        }
+
+        if (calc.items.length > 0) {
+            text += `\n*DAFTAR SPARE PART:*\n`;
+            calc.items.forEach(item => {
+                const kode = item.code ? `[${item.code}] ` : '';
+                text += `- ${kode}${item.name} : ${formatRupiah(item.price)}\n`;
+            });
+        }
+
+        text += `----------------------------------------\n`;
+        text += `Subtotal       : ${formatRupiah(calc.subtotal)}\n`;
+        if (isWarranty) {
+            text += `Potongan Garansi: -${formatRupiah(calc.subtotal)}\n`;
+        } else {
+            text += `Diskon (${discPercent}%)   : -${formatRupiah(calc.discountAmount)}\n`;
+            text += `DPP            : ${formatRupiah(calc.dpp)}\n`;
+            text += `PPN (11%)      : ${formatRupiah(calc.ppn)}\n`;
+        }
+        text += `*TOTAL BAYAR   : ${formatRupiah(calc.grandTotal)}*\n`;
+
+        if (calc.dpRequired > 0) {
+            text += `*WAJIB DP (50%) : ${formatRupiah(calc.dpRequired)}*\n`;
+        }
+
+        text += `----------------------------------------\n`;
+        text += `*CATATAN & KETENTUAN:*\n`;
+        text += `1. Penawaran ini hanya berlaku 1 Minggu (7 hari) untuk konfirmasi persetujuan. Lewat dari itu harus dibuatkan ulang perhitungan.\n`;
+        text += `2. Harga sewaktu-waktu dapat berubah setelah 7 hari belum ada konfirmasi persetujuan.\n`;
+        text += `3. Biaya di atas Rp 1.000.000 dibutuhkan uang muka (DP) sebesar 50% sebagai bukti kepastian persetujuan biaya.\n`;
+
+        return text;
+    }
+
+    function shareWhatsApp() {
+        const text = generateReportText();
+        let phone = document.getElementById('custPhone').value.replace(/\D/g, '');
+        if (phone.startsWith('0')) {
+            phone = '62' + phone.substring(1);
+        }
+        const url = phone
+            ? `https://wa.me/${phone}?text=${encodeURIComponent(text)}`
+            : `https://wa.me/?text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
+    }
+
+    function shareEmail() {
+        const text = generateReportText().replace(/\*/g, '');
+        const custName = document.getElementById('custName').value.trim() || 'Customer';
+        const unitModel = document.getElementById('unitModel').value.trim() || '';
+        const subject = `Penawaran Biaya Servis - ${custName} ${unitModel ? '(' + unitModel + ')' : ''}`;
+        window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(text)}`;
+    }
+
+    function saveAsTxt() {
+        const text = generateReportText().replace(/\*/g, '');
+        const custName = document.getElementById('custName').value.trim().replace(/\s+/g, '_') || 'Customer';
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `Penawaran_Servis_${custName}.txt`;
+        link.click();
     }
 
     function resetForm() {
+        document.getElementById('custName').value = '';
+        document.getElementById('custPhone').value = '';
+        document.getElementById('custAddress').value = '';
+        document.getElementById('unitModel').value = '';
+        document.getElementById('unitSerial').value = '';
         document.getElementById('laborCost').value = '';
-        document.getElementById('partCode').value = '';
-        document.getElementById('partName').value = '';
-        document.getElementById('partCost').value = '';
+        document.getElementById('visitCost').value = '';
+        document.getElementById('otherDesc').value = '';
+        document.getElementById('otherCost').value = '';
         document.getElementById('discountPercent').value = 20;
         document.getElementById('discountOnlyPart').checked = false;
+
+        document.getElementById('partsContainer').innerHTML = '';
+        partCounter = 0;
+        addPartRow();
         setWarranty(false);
     }
+
+    // Inisialisasi 1 baris part pertama saat halaman dibuka
+    window.onload = function() {
+        addPartRow();
+    };
 </script>
 
 </body>
